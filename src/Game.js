@@ -74,7 +74,6 @@ class Game extends React.Component {
       winner = gameIsOver.winner;
       winnerSquares = gameIsOver.winnerSquares;
     }
-    console.log(winnerSquares);
 
     const moves = history.map((step, move) => {
       // display the location for each move
@@ -118,6 +117,8 @@ class Game extends React.Component {
     let status;
     if (winner) {
       status = "Winner: " + winner;
+    } else if (this.state.stepNumber === 9) {
+      status = "DRAW";
     } else {
       status = "Next player: " + (this.state.xIsNext ? "X" : "O");
     }
