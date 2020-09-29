@@ -8,7 +8,9 @@ class Game extends React.Component {
       history: [{ squares: Array(9).fill(null) }],
       stepNumber: 0,
       xIsNext: true,
+      ascending: true,
     };
+    this.toggleButton = this.toggleButton.bind(this);
   }
 
   handleClick(i) {
@@ -31,6 +33,10 @@ class Game extends React.Component {
       stepNumber: step,
       xIsNext: step % 2 === 0,
     });
+  }
+
+  toggleButton() {
+    this.setState({ ascending: !this.state.ascending });
   }
 
   calculateWinner(squares) {
@@ -118,7 +124,10 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
-          <ol>{moves}</ol>
+          <button onClick={this.toggleButton}>
+            {this.state.ascending ? "ascending" : "descending"}
+          </button>
+          <ol>{this.state.ascending ? moves : moves.reverse()}</ol>
         </div>
       </div>
     );

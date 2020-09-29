@@ -50,6 +50,10 @@ ul {
   margin-left: 20px;
 }
 
+.game-info ol li {
+  list-style: none;
+}
+
 .boldCurrentMove {
   font-weight: bold;
 }
