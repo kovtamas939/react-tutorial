@@ -63,6 +63,7 @@ class Game extends React.Component {
     const winner = this.calculateWinner(current.squares);
 
     const moves = history.map((step, move) => {
+      // display the location for each move
       const currentClick = step.currentClick;
       let col = 1;
       if (currentClick === 1 || currentClick === 4 || currentClick === 7) {
@@ -82,12 +83,20 @@ class Game extends React.Component {
         row = 3;
       }
 
+      // bold the currently selected item in the move list
+      let boldClass = null;
+      if (this.state.stepNumber === move) {
+        boldClass = "boldCurrentMove";
+      }
+
       const desc = move
         ? `Go to move # ${move} | col: ${col} row: ${row}`
         : "Go to game start";
       return (
         <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+          <button className={boldClass} onClick={() => this.jumpTo(move)}>
+            {desc}
+          </button>
         </li>
       );
     });
