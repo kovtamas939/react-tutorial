@@ -1,14 +1,14 @@
 import React from "react";
 
-function Square(props) {
+const Square = ({ onClick, value, winnerSquare }) => {
   const nameOfClass = ["square"];
-  nameOfClass.push(props.winnerSquare ? "squareHighlighted" : null);
+  nameOfClass.push(winnerSquare ? "squareHighlighted" : null);
 
   return (
-    <button className={nameOfClass.join(" ")} onClick={props.onClick}>
-      {props.value}
+    <button className={nameOfClass.join(" ")} onClick={onClick}>
+      {value}
     </button>
   );
-}
+};
 
 export default Square;
