@@ -1,45 +1,35 @@
-import React from "react";
+import React, { useState } from "react";
 import Board from "./Board";
 
-class Game extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      history: [{ squares: Array(9).fill(null) }],
-      stepNumber: 0,
-      xIsNext: true,
-      ascending: true,
-    };
-    this.toggleButton = this.toggleButton.bind(this);
-  }
+const Game = () => {
+  const [history, setHistory] = useState([{ squares: Array(9).fill(null) }]);
+  const [stepNumber, setStepNumber] = useState(0);
+  const [xIsNext, setXIsNext] = useState(true);
+  const [ascending, setAscending] = useState(true);
 
-  handleClick(i) {
-    const history = this.state.history.slice(0, this.state.stepNumber + 1);
-    const current = history[history.length - 1];
+  const handleClick = (i) => {
+    const historyCopy = history.slice(0, stepNumber + 1);
+    const current = historyCopy[historyCopy.length - 1];
     const squares = current.squares.slice();
-    if (this.calculateWinner(squares) || squares[i]) {
+    if (calculateWinner(squares) || squares[i]) {
       return;
     }
-    squares[i] = this.state.xIsNext ? "X" : "O";
-    this.setState({
-      history: history.concat({ squares: squares, currentClick: i }),
-      stepNumber: history.length,
-      xIsNext: !this.state.xIsNext,
-    });
-  }
+    squares[i] = xIsNext ? "X" : "O";
+    setHistory(historyCopy.concat({ squares: squares, currentClick: i }));
+    setStepNumber(historyCopy.length);
+    setXIsNext(!xIsNext);
+  };
 
-  jumpTo(step) {
-    this.setState({
-      stepNumber: step,
-      xIsNext: step % 2 === 0,
-    });
-  }
+  const jumpTo = (step) => {
+    setStepNumber(step);
+    setXIsNext(step % 2 === 0);
+  };
 
-  toggleButton() {
-    this.setState({ ascending: !this.state.ascending });
-  }
+  const toggleButton = () => {
+    setAscending(!ascending);
+  };
 
-  calculateWinner(squares) {
+  const calculateWinner = (squares) => {
     const lines = [
       [0, 1, 2],
       [3, 4, 5],
@@ -61,87 +51,80 @@ class Game extends React.Component {
       }
     }
     return null;
+  };
+
+  const current = history[stepNumber];
+  const gameIsOver = calculateWinner(current.squares);
+  let winner;
+  let winnerSquares;
+
+  if (gameIsOver) {
+    winner = gameIsOver.winner;
+    winnerSquares = gameIsOver.winnerSquares;
   }
 
-  render() {
-    const history = this.state.history;
-    const current = history[this.state.stepNumber];
-    const gameIsOver = this.calculateWinner(current.squares);
-    let winner;
-    let winnerSquares;
+  const moves = history.map((step, move) => {
+    // display the location for each move
+    const currentClick = step.currentClick;
+    let col = 1;
+    if (currentClick === 1 || currentClick === 4 || currentClick === 7) {
+      col = 2;
+    } else if (currentClick === 2 || currentClick === 5 || currentClick === 8) {
+      col = 3;
+    }
+    let row = 2;
 
-    if (gameIsOver) {
-      winner = gameIsOver.winner;
-      winnerSquares = gameIsOver.winnerSquares;
+    if (currentClick < 3) {
+      row = 1;
+    } else if (currentClick > 5) {
+      row = 3;
     }
 
-    const moves = history.map((step, move) => {
-      // display the location for each move
-      const currentClick = step.currentClick;
-      let col = 1;
-      if (currentClick === 1 || currentClick === 4 || currentClick === 7) {
-        col = 2;
-      } else if (
-        currentClick === 2 ||
-        currentClick === 5 ||
-        currentClick === 8
-      ) {
-        col = 3;
-      }
-      let row = 2;
-
-      if (currentClick < 3) {
-        row = 1;
-      } else if (currentClick > 5) {
-        row = 3;
-      }
-
-      // bold the currently selected item in the move list
-      let boldClass = null;
-      if (this.state.stepNumber === move) {
-        boldClass = "boldCurrentMove";
-      }
-
-      const desc = move
-        ? `Go to move # ${move} | col: ${col} row: ${row}`
-        : "Go to game start";
-      return (
-        <li key={move}>
-          <button className={boldClass} onClick={() => this.jumpTo(move)}>
-            {desc}
-          </button>
-        </li>
-      );
-    });
-
-    let status;
-    if (winner) {
-      status = "Winner: " + winner;
-    } else if (this.state.stepNumber === 9) {
-      status = "DRAW";
-    } else {
-      status = "Next player: " + (this.state.xIsNext ? "X" : "O");
+    // bold the currently selected item in the move list
+    let boldClass = null;
+    if (stepNumber === move) {
+      boldClass = "boldCurrentMove";
     }
 
+    const desc = move
+      ? `Go to move # ${move} | col: ${col} row: ${row}`
+      : "Go to game start";
     return (
-      <div className="game">
-        <div className="game-board">
-          <Board
-            squares={current.squares}
-            onClick={(i) => this.handleClick(i)}
-            winnerSquares={winnerSquares}
-          />
-        </div>
-        <div className="game-info">
-          <div>{status}</div>
-          <button onClick={this.toggleButton}>
-            {this.state.ascending ? "ascending" : "descending"}
-          </button>
-          <ol>{this.state.ascending ? moves : moves.reverse()}</ol>
-        </div>
-      </div>
+      <li key={move}>
+        <button className={boldClass} onClick={() => jumpTo(move)}>
+          {desc}
+        </button>
+      </li>
     );
+  });
+
+  let status;
+  if (winner) {
+    status = "Winner: " + winner;
+  } else if (stepNumber === 9) {
+    status = "DRAW";
+  } else {
+    status = "Next player: " + (xIsNext ? "X" : "O");
   }
-}
+
+  return (
+    <div className="game">
+      <div className="game-board">
+        <Board
+          squares={current.squares}
+          onClick={(i) => handleClick(i)}
+          winnerSquares={winnerSquares}
+        />
+      </div>
+      <div className="game-info">
+        <div>{status}</div>
+        <button onClick={toggleButton}>
+          {ascending ? "ascending" : "descending"}
+        </button>
+        <ol>{ascending ? moves : moves.reverse()}</ol>
+      </div>
+    </div>
+  );
+};
 
 export default Game;
