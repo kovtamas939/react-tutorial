@@ -1,13 +1,17 @@
 import React, { useState } from "react";
 import Board from "./Board";
 
-const Game = () => {
-  const [history, setHistory] = useState([{ squares: Array(9).fill(null) }]);
-  const [stepNumber, setStepNumber] = useState(0);
-  const [xIsNext, setXIsNext] = useState(true);
-  const [ascending, setAscending] = useState(true);
+type SquareValue = "X" | "O" | null;
 
-  const handleClick = (i) => {
+const Game: React.FC = () => {
+  const [history, setHistory] = useState<
+    { squares: SquareValue[]; currentClick: number }[]
+  >([{ squares: Array(9).fill(null), currentClick: 0 }]);
+  const [stepNumber, setStepNumber] = useState<number>(0);
+  const [xIsNext, setXIsNext] = useState<boolean>(true);
+  const [ascending, setAscending] = useState<boolean>(true);
+
+  const handleClick = (i: number): void => {
     const historyCopy = history.slice(0, stepNumber + 1);
     const current = historyCopy[historyCopy.length - 1];
     const squares = current.squares.slice();
@@ -20,7 +24,7 @@ const Game = () => {
     setXIsNext(!xIsNext);
   };
 
-  const jumpTo = (step) => {
+  const jumpTo = (step: number): void => {
     setStepNumber(step);
     setXIsNext(step % 2 === 0);
   };
@@ -29,7 +33,9 @@ const Game = () => {
     setAscending(!ascending);
   };
 
-  const calculateWinner = (squares) => {
+  const calculateWinner = (
+    squares: SquareValue[]
+  ): { winner: SquareValue; winnerSquares: number[] } | null => {
     const lines = [
       [0, 1, 2],
       [3, 4, 5],
@@ -56,7 +62,7 @@ const Game = () => {
   const current = history[stepNumber];
   const gameIsOver = calculateWinner(current.squares);
   let winner;
-  let winnerSquares;
+  let winnerSquares: boolean | number[] = false;
 
   if (gameIsOver) {
     winner = gameIsOver.winner;
@@ -81,7 +87,7 @@ const Game = () => {
     }
 
     // bold the currently selected item in the move list
-    let boldClass = null;
+    let boldClass: string = "";
     if (stepNumber === move) {
       boldClass = "boldCurrentMove";
     }
