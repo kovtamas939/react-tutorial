@@ -1,9 +1,17 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import Square from "./Square";
 
-const Board = ({ squares, onClick, winnerSquares }) => {
-  const renderSquare = (i) => {
-    let winnersSquare;
+type SquareValue = "X" | "O" | null;
+
+interface Props {
+  squares: SquareValue[];
+  onClick(i: number): void;
+  winnerSquares: false | Array<number>;
+}
+
+const Board: React.FC<Props> = ({ squares, onClick, winnerSquares }) => {
+  const renderSquare = (i: number): ReactNode => {
+    let winnersSquare = false;
     if (winnerSquares && winnerSquares.includes(i)) {
       winnersSquare = true;
     }
